@@ -27,7 +27,7 @@ var Challenge = function(session, type, error, json) {
     this._session = session;
     this._type = type;
     this._error = error;
-    this.apiUrl = 'https://i.instagram.com/api/v1'+error.json.challenge.api_path;
+    this.apiUrl = error.json.challenge.url; //'https://i.instagram.com'+error.json.challenge.api_path;
 };
 //WARNING: This is NOT backward compatible code since most methods are not needed anymore. But you are free to make it backward compatible :)
 //How does it works now?
