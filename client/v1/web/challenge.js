@@ -74,6 +74,8 @@ Challenge.resolve = function(checkpointError,defaultMethod,skipResetStep){
         //Challenge is not required
         if(json.status==='ok' && json.action==='close') throw new Exceptions.NoChallengeRequired;
 
+        console.log(json)
+
         //Using API-version of challenge
         switch(json.step_name){
             case 'select_verify_method':{
@@ -97,6 +99,9 @@ Challenge.resolve = function(checkpointError,defaultMethod,skipResetStep){
                 }
                 case 'verify_email':{
                     return new EmailVerificationChallenge(session, 'email', checkpointError, json);
+                }
+                case 'delta_login_review':{
+                    return new ItWasMeVerificationChallenge(session, 'itwasme', checkpointError, json);
                 }
                 default: return new NotImplementedChallenge(session, json.step_name, checkpointError, json);
             }
@@ -283,6 +288,13 @@ var EmailVerificationChallenge = function(session, type, checkpointError, json) 
 
 util.inherits(EmailVerificationChallenge, Challenge);
 exports.EmailVerificationChallenge = EmailVerificationChallenge;
+
+var ItWasMeVerificationChallenge = function(session, type, checkpointError, json) {
+    Challenge.apply(this, arguments);
+}
+
+util.inherits(ItWasMeVerificationChallenge, Challenge);
+exports.ItWasMeVerificationChallenge = ItWasMeVerificationChallenge;
 
 var NotImplementedChallenge = function(session) {
     Challenge.apply(this, arguments);
