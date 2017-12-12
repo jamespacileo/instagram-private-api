@@ -46,6 +46,8 @@ Challenge.resolve = function(checkpointError,defaultMethod,skipResetStep){
     if(['email','phone'].indexOf(defaultMethod)==-1) throw new Error('Invalid default method');
     var session = checkpointError.session;
 
+    console.log('API URL: ' + this.apiUrl);
+
     return new Promise(function(res,rej){
         if(skipResetStep) return res();
         return res(that.reset(checkpointError))
