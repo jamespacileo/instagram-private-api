@@ -40,22 +40,29 @@ var Challenge = function(session, type, error, json) {
 Challenge.resolve = function(checkpointError,defaultMethod,skipResetStep){
     var that = this;
     checkpointError = checkpointError instanceof Exceptions.CheckpointError ? checkpointError : checkpointError.json;
-    if(!this.apiUrl) this.apiUrl = 'https://i.instagram.com/api/v1'+checkpointError.json.challenge.api_path;
+    var apiUrl = that.apiUrl;
+
+    if (checkpointError && checkpointError.json && checkpointError.json.challenge && checkpointError.json.challenge.api_path) {
+        console.log('old api url: ' + apiUrl)
+        apiUrl = 'https://i.instagram.com/api/v1'+checkpointError.json.challenge.api_path;
+        console.log('new api url: ' + apiUrl)
+    }
+    //if(!this.apiUrl) this.apiUrl = 'https://i.instagram.com/api/v1'+checkpointError.json.challenge.api_path;
     if(typeof defaultMethod==='undefined') defaultMethod = 'email';
     if(!(checkpointError instanceof Exceptions.CheckpointError)) throw new Error("`Challenge.resolve` method must get exception (type of `CheckpointError`) as a first argument");
     if(['email','phone'].indexOf(defaultMethod)==-1) throw new Error('Invalid default method');
     var session = checkpointError.session;
 
-    console.log('API URL: ' + this.apiUrl);
+    console.log('API URL: ' + apiUrl);
 
     return new Promise(function(res,rej){
         if(skipResetStep) return res();
-        return res(that.reset(checkpointError))
+        return res(that.reset(checkpointError, apiUrl))
     })
     .then(function() {
         return new WebRequest(session)
             .setMethod('GET')
-            .setUrl(that.apiUrl)
+            .setUrl(apiUrl)
             .setHeaders({
                 'User-Agent': iPhoneUserAgent
             })
@@ -76,14 +83,12 @@ Challenge.resolve = function(checkpointError,defaultMethod,skipResetStep){
         //Challenge is not required
         if(json.status==='ok' && json.action==='close') throw new Exceptions.NoChallengeRequired;
 
-        console.log(json)
-
         //Using API-version of challenge
         switch(json.step_name){
             case 'select_verify_method':{
                 return new WebRequest(session)
                     .setMethod('POST')
-                    .setUrl(that.apiUrl)
+                    .setUrl(apiUrl)
                     .setHeaders({
                         'User-Agent': iPhoneUserAgent
                     })
@@ -177,7 +182,7 @@ Challenge.resolveHtml = function(checkpointError,defaultMethod){
         }
     }
 }
-Challenge.reset = function(checkpointError){
+Challenge.reset = function(checkpointError, apiUrl){
     var that = this;
 
     var session = checkpointError.session;
@@ -185,7 +190,7 @@ Challenge.reset = function(checkpointError){
     return new Request(session)
         .setMethod('POST')
         .setBodyType('form')
-        .setUrl(that.apiUrl.replace('/challenge/','/challenge/reset/'))
+        .setUrl(apiUrl.replace('/challenge/','/challenge/reset/'))
         .setHeaders({
             'User-Agent': iPhoneUserAgent
         })
