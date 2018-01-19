@@ -118,7 +118,10 @@ FeedBase.prototype.setCursor = function (cursor) {
 };
 
 FeedBase.prototype.getCursor = function () {
-    return this.cursor;
+    try {
+        this.cursor = JSON.parse(this.cursor)
+    } catch(e) {}
+    return this.cursor.server_cursor || this.cursor;
 };
 
 FeedBase.prototype.isMoreAvailable = function() {
