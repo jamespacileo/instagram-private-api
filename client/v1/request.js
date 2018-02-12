@@ -41,7 +41,11 @@ var Session = require('./session');
 
 Request.defaultHeaders = {
     'X-IG-Connection-Type': 'WIFI',
-    'X-IG-Capabilities': '3QI=',
+    'X-IG-Capabilities': '3brTBw==',
+    'X-IG-App-ID': CONSTANTS.APPLICATION_ID,
+    'X-FB-HTTP-Engine': 'Liger',
+    'X-IG-Bandwidth-TotalBytes-B': '0',
+    'X-IG-Bandwidth-TotalTime-MS': '0',
     'Accept-Language': 'en-US',
     'Host': CONSTANTS.HOSTNAME,
     'Accept': '*/*',
