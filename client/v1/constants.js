@@ -114,5 +114,6 @@ module.exports = {
     API_ENDPOINT: HOST + 'api/v1/',
     EXPERIMENTS: EXPERIMENTS,
     PRIVATE_KEY: PRIVATE_KEY,
+    APPLICATION_ID: '567067343352427',
     instagramAgentTemplate: _.template('Instagram <%= version %> Android (<%= agent %>)')
 }
