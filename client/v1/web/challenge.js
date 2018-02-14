@@ -43,9 +43,7 @@ Challenge.resolve = function(checkpointError,defaultMethod,skipResetStep){
     var apiUrl = that.apiUrl;
 
     if (checkpointError && checkpointError.json && checkpointError.json.challenge && checkpointError.json.challenge.api_path) {
-        console.log('old api url: ' + apiUrl)
         apiUrl = 'https://i.instagram.com/api/v1'+checkpointError.json.challenge.api_path;
-        console.log('new api url: ' + apiUrl)
     }
     //if(!this.apiUrl) this.apiUrl = 'https://i.instagram.com/api/v1'+checkpointError.json.challenge.api_path;
     if(typeof defaultMethod==='undefined') defaultMethod = 'email';
@@ -86,6 +84,12 @@ Challenge.resolve = function(checkpointError,defaultMethod,skipResetStep){
         //Using API-version of challenge
         switch(json.step_name){
             case 'select_verify_method':{
+                var choice = defaultMethod==='email' ? '1' : '0';
+
+                if (json.step_data && json.step_data.choice) {
+                    choice = json.step_data.choice;
+                }
+
                 return new WebRequest(session)
                     .setMethod('POST')
                     .setUrl(apiUrl)
@@ -93,7 +97,7 @@ Challenge.resolve = function(checkpointError,defaultMethod,skipResetStep){
                         'User-Agent': iPhoneUserAgent
                     })
                     .setData({
-                        "choice": defaultMethod==='email' ? 1 : 0
+                        "choice": choice
                         })
                         .send({followRedirect: true})
                         .then(function(){

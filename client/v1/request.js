@@ -324,6 +324,8 @@ Request.prototype.errorMiddleware = function (response) {
         throw new Exceptions.CheckpointError(json, this.session);
     if (json.message == 'login_required')
         throw new Exceptions.AuthenticationError("Login required to process this request");
+    if (json.message == 'invalid_user')
+        throw new Exceptions.InvalidUsername('username', json);
     if (json.error_type == 'sentry_block')
         throw new Exceptions.SentryBlockError(json);
     if (response.statusCode===429 || _.isString(json.message) && json.message.toLowerCase().indexOf('too many requests') !== -1)
@@ -337,10 +339,16 @@ Request.prototype.errorMiddleware = function (response) {
 // If you need to perform loging or something like that!
 // will also accept promise
 Request.prototype.beforeParse = function (response, request, attemps) {
+    // console.log('======')
+    // console.log('url: ' + request.url + ' - response: ' + response.body);
+    // console.log('======')
     return response;
 }
 
 Request.prototype.beforeError = function (error, request, attemps) {
+    // console.log('======')
+    // console.log('ERROR url: ' + request.url + ' - response: ' + error);
+    // console.log('======')
     throw error;
 }
 
@@ -362,6 +370,7 @@ Request.prototype.send = function (options, attemps) {
         })
         .then(function(opts) {
             options = opts;
+            console.log(options)
             return [Request.requestClient(options), options, attemps]
         })
         .spread(_.bind(this.beforeParse, this))
