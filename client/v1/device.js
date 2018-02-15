@@ -135,8 +135,6 @@ Device.prototype.userAgent = function(version) {
     var agent = [this.api + "/" + this.release, this.dpi + 'dpi',
         this.resolution, this.info.manufacturer, this.info.model, this.info.device, this.language];
 
-    agent = ['23/6.0.1; 640dpi; 1440x2560; samsung; SM-G930F; herolte; samsungexynos8890'];
-
     return CONSTANTS.instagramAgentTemplate({
         agent: agent.join('; '),
         version: version || CONSTANTS.PRIVATE_KEY.APP_VERSION
