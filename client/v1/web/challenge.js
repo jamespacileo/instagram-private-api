@@ -61,9 +61,9 @@ Challenge.resolve = function(checkpointError,defaultMethod,skipResetStep){
         return new WebRequest(session)
             .setMethod('GET')
             .setUrl(apiUrl)
-            .setHeaders({
-                'User-Agent': iPhoneUserAgent
-            })
+            // .setHeaders({
+            //     'User-Agent': iPhoneUserAgent
+            // })
             .send({followRedirect: true})
         })
         .catch(errors.StatusCodeError, function(error){
@@ -93,9 +93,9 @@ Challenge.resolve = function(checkpointError,defaultMethod,skipResetStep){
                 return new WebRequest(session)
                     .setMethod('POST')
                     .setUrl(apiUrl)
-                    .setHeaders({
-                        'User-Agent': iPhoneUserAgent
-                    })
+                    // .setHeaders({
+                    //     'User-Agent': iPhoneUserAgent
+                    // })
                     .setData({
                         "choice": choice
                         })
@@ -129,7 +129,7 @@ Challenge.resolveHtml = function(checkpointError,defaultMethod){
         .setMethod('GET')
         .setUrl(checkpointError.url)
         .setHeaders({
-            'User-Agent': iPhoneUserAgentHtml,
+            //'User-Agent': iPhoneUserAgentHtml,
             'Referer': checkpointError.url,
         })
         .send({followRedirect: true})
@@ -163,7 +163,7 @@ Challenge.resolveHtml = function(checkpointError,defaultMethod){
                     .setMethod('POST')
                     .setUrl(checkpointError.url)
                     .setHeaders({
-                        'User-Agent': iPhoneUserAgentHtml,
+                        //'User-Agent': iPhoneUserAgentHtml,
                         'Referer': checkpointError.url,
                         'Content-Type': 'application/x-www-form-urlencoded',
                         'X-Instagram-AJAX': 1
@@ -196,7 +196,7 @@ Challenge.reset = function(checkpointError, apiUrl){
         .setBodyType('form')
         .setUrl(apiUrl.replace('/challenge/','/challenge/reset/'))
         .setHeaders({
-            'User-Agent': iPhoneUserAgent
+            //'User-Agent': iPhoneUserAgent
         })
         .signPayload()
         .send({followRedirect: true})
@@ -214,7 +214,7 @@ Challenge.prototype.code = function(code){
         .setMethod('POST')
         .setUrl(that.apiUrl)
         .setHeaders({
-            'User-Agent': iPhoneUserAgent
+            //'User-Agent': iPhoneUserAgent
         })
         .setBodyType('form')
         .setData({
@@ -273,7 +273,7 @@ PhoneVerificationChallenge.prototype.phone = function(phone){
         .setMethod('POST')
         .setUrl(that.apiUrl)
         .setHeaders({
-            'User-Agent': iPhoneUserAgent
+           // 'User-Agent': iPhoneUserAgent
         })
         .setBodyType('form')
         .setData({
