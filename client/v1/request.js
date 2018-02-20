@@ -370,7 +370,6 @@ Request.prototype.send = function (options, attemps) {
         })
         .then(function(opts) {
             options = opts;
-            console.log(options)
             return [Request.requestClient(options), options, attemps]
         })
         .spread(_.bind(this.beforeParse, this))
