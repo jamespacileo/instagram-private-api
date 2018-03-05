@@ -16,14 +16,14 @@ module.exports = Device;
 
 
 Object.defineProperty(Device.prototype, "id", {
-    get: function() { 
+    get: function() {
         return 'android-' + this.md5.slice(0, 16)
     }
 });
 
 
 Object.defineProperty(Device.prototype, "md5", {
-    get: function() { 
+    get: function() {
         return md5(this.username)
     }
 });
@@ -31,7 +31,7 @@ Object.defineProperty(Device.prototype, "md5", {
 
 // Useful for getting device from csv based on line number
 Object.defineProperty(Device.prototype, "md5int", {
-    get: function() { 
+    get: function() {
         if(!this._md5int)
             this._md5int = parseInt(parseInt(this.md5, 32) / 10e32);
         return this._md5int;
@@ -40,31 +40,31 @@ Object.defineProperty(Device.prototype, "md5int", {
 
 
 Object.defineProperty(Device.prototype, "api", {
-    get: function() { 
+    get: function() {
         if(!this._api)
             this._api = 18 + (this.md5int % 5);
         return this._api;
     },
-    set: function(api) { 
+    set: function(api) {
         this._api = api;
     }
 });
 
 
 Object.defineProperty(Device.prototype, "release", {
-    get: function() { 
+    get: function() {
         if(!this._release)
             this._release = ['4.0.4', '4.3.1', '4.4.4', '5.1.1', '6.0.1'][this.md5int % 5];
         return this._release;
     },
-    set: function(release) { 
+    set: function(release) {
         this._release = release;
     }
 });
 
 
 Object.defineProperty(Device.prototype, "info", {
-    get: function() { 
+    get: function() {
         if(this._info) return this._info;
         var line = devices[this.md5int % devices.length];
         var info = {
@@ -131,8 +131,10 @@ Object.defineProperty(Device.prototype, "language", {
 
 
 Device.prototype.userAgent = function(version) {
-    var agent = [this.api + "/" + this.release, this.dpi + 'dpi', 
-        this.resolution, this.info.manufacturer, this.info.model, this.info.device, this.language];    
+    // hardcode agent for testing purposes
+    var agent = [this.api + "/" + this.release, this.dpi + 'dpi',
+        this.resolution, this.info.manufacturer, this.info.model, this.info.device, this.language];
+
     return CONSTANTS.instagramAgentTemplate({
         agent: agent.join('; '),
         version: version || CONSTANTS.PRIVATE_KEY.APP_VERSION

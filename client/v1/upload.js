@@ -33,7 +33,7 @@ Upload.photo = function (session, streamOrPathOrBuffer, uploadId, name, isSideca
     var compresion = {
         "lib_name": "jt",
         "lib_version": "1.3.0",
-        "quality": "92"
+        "quality": "91"
     }
     var isThumbnail = !!uploadId;
     var predictedUploadId = uploadId || new Date().getTime();
@@ -53,7 +53,7 @@ Upload.photo = function (session, streamOrPathOrBuffer, uploadId, name, isSideca
     }
 
     return request.setMethod('POST')
-        .setResource('uploadPhoto')                    
+        .setResource('uploadPhoto')
         .generateUUID()
         .setData(fields)
         .transform(function(opts){
@@ -68,7 +68,7 @@ Upload.photo = function (session, streamOrPathOrBuffer, uploadId, name, isSideca
         })
         .send()
         .then(function(json) {
-            return new Upload(session, json);    
+            return new Upload(session, json);
         })
 }
 
