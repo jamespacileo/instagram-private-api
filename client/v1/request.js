@@ -43,13 +43,15 @@ Request.defaultHeaders = {
     'X-IG-Connection-Type': 'WIFI',
     'X-IG-Capabilities': '3brTBw==',
     'X-IG-App-ID': CONSTANTS.APPLICATION_ID,
-    'X-FB-HTTP-Engine': 'Liger',
     'X-IG-Bandwidth-TotalBytes-B': '0',
     'X-IG-Bandwidth-TotalTime-MS': '0',
+    'X-IG-Connection-Speed': '-1kbps',
+    'X-IG-Bandwidth-Speed-KBPS': '-1.000',
     'Accept-Language': 'en-US',
     'Host': CONSTANTS.HOSTNAME,
     'Accept': '*/*',
-    'Accept-Encoding': 'gzip, deflate, sdch',
+    'Accept-Encoding': 'gzip',
+    'Accept-Language': 'en-US',
     'Connection': 'Close'
 };
 
