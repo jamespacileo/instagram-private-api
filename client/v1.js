@@ -60,7 +60,6 @@ InstagramV1.Web.Challenge = challenge.Challenge;
 InstagramV1.Web.NotImplementedChallenge = challenge.NotImplementedChallenge;
 InstagramV1.Web.EmailVerificationChallenge = challenge.EmailVerificationChallenge;
 InstagramV1.Web.PhoneVerificationChallenge = challenge.PhoneVerificationChallenge;
-InstagramV1.Web.BaseChallenge = challenge.BaseChallenge;
 
 
 module.exports = InstagramV1;
