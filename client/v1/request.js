@@ -1,6 +1,6 @@
 var _ = require("lodash");
 var Promise = require("bluebird");
-var request = require('request-promise');
+var request = require('request-promise-native');
 var JSONbig = require('json-bigint');
 var Agent = require('socks5-https-client/lib/Agent');
 
@@ -15,17 +15,17 @@ function Request(session) {
     this._request.data = {};
     this._request.bodyType = 'formData';
     this._request.options = {
-        gzip: true 
+        gzip: true
     };
-    this._request.headers=_.extend({},Request.defaultHeaders);
+    this._request.headers = _.extend({}, Request.defaultHeaders);
     this.attemps = 2;
-    if(session) {
-        this.session = session;            
+    if (session) {
+        this.session = session;
     } else {
-        this.setData({_csrftoken: 'missing'});
-    }      
-    this._initialize.apply(this, arguments);    
-    this._transform = function(t){ return t };
+        this.setData({ _csrftoken: 'missing' });
+    }
+    this._initialize.apply(this, arguments);
+    this._transform = function(t) { return t };
 }
 
 module.exports = Request;
@@ -52,55 +52,57 @@ Request.defaultHeaders = {
 
 Request.requestClient = request.defaults({});
 
-Request.setTimeout = function (ms) {
+Request.setTimeout = function(ms) {
     var object = { 'timeout': parseInt(ms) };
     Request.requestClient = request.defaults(object);
 }
 
-Request.setProxy = function (proxyUrl) {
-    if(!Helpers.isValidUrl(proxyUrl))
+Request.setProxy = function(proxyUrl) {
+    if (!Helpers.isValidUrl(proxyUrl))
         throw new Error("`proxyUrl` argument is not an valid url")
-    var object = { 'proxy': proxyUrl };    
+    var object = { 'proxy': proxyUrl };
     Request.requestClient = request.defaults(object);
 }
 
-Request.setSocks5Proxy = function (host, port) {
-    var object = { agentClass: Agent,
-    agentOptions: {
-        socksHost: host, // Defaults to 'localhost'.
-        socksPort: port // Defaults to 1080.
-    }};
+Request.setSocks5Proxy = function(host, port) {
+    var object = {
+        agentClass: Agent,
+        agentOptions: {
+            socksHost: host, // Defaults to 'localhost'.
+            socksPort: port // Defaults to 1080.
+        }
+    };
     Request.requestClient = request.defaults(object);
 }
 
 Object.defineProperty(Request.prototype, "session", {
-    get: function() { 
-        return this._session 
+    get: function() {
+        return this._session
     },
-    
+
     set: function(session) {
-        this.setSession(session);    
+        this.setSession(session);
     }
 });
 
 Object.defineProperty(Request.prototype, "device", {
-    get: function() { 
-        return this._device 
+    get: function() {
+        return this._device
     },
-    
+
     set: function(device) {
-        this.setDevice(device);    
+        this.setDevice(device);
     }
 });
 
 
 Object.defineProperty(Request.prototype, "url", {
-    get: function() { 
-        return this._url 
+    get: function() {
+        return this._url
     },
-    
+
     set: function(url) {
-        this.setUrl(url); 
+        this.setUrl(url);
     }
 });
 
@@ -111,7 +113,7 @@ Request.prototype._initialize = function() {
 
 
 Request.prototype.setOptions = function(options, override) {
-    this._request.options = override ? 
+    this._request.options = override ?
         _.extend(this._request.options, options || {}) :
         _.defaults(this._request.options, options || {});
     return this;
@@ -120,34 +122,34 @@ Request.prototype.setOptions = function(options, override) {
 
 Request.prototype.setMethod = function(method) {
     method = method.toUpperCase();
-    if(!_.includes(['POST', 'GET', 'PATCH', 'PUT', 'DELETE'], method))
-        throw new Error("Method `"+ method + "` is not valid method");
+    if (!_.includes(['POST', 'GET', 'PATCH', 'PUT', 'DELETE'], method))
+        throw new Error("Method `" + method + "` is not valid method");
     this._request.method = method;
     return this;
 };
 
 
 Request.prototype.setData = function(data, override) {
-    if(_.isEmpty(data)){
+    if (_.isEmpty(data)) {
         this._request.data = {};
         return this;
     }
-    if(_.isString(data)) {
+    if (_.isString(data)) {
         this._request.data = data;
         return this;
     }
     _.each(data, function(val, key) {
-        data[key] = val && val.toString && !_.isObject(val) ? 
+        data[key] = val && val.toString && !_.isObject(val) ?
             val.toString() : val;
     })
-    this._request.data = override ? 
+    this._request.data = override ?
         data : _.extend(this._request.data, data || {});
     return this;
 };
 
 
 Request.prototype.setBodyType = function(type) {
-    if(!_.includes(['form', 'formData', 'json', 'body'], type))
+    if (!_.includes(['form', 'formData', 'json', 'body'], type))
         throw new Error("`bodyType` param must be and form, formData, json or body")
     this._request.bodyType = type;
     return this;
@@ -161,7 +163,7 @@ Request.prototype.signPayload = function() {
 
 
 Request.prototype.transform = function(callback) {
-    if(!_.isFunction(callback))
+    if (!_.isFunction(callback))
         throw new Error("Transform must be an valid function")
     this._transform = callback;
     return this;
@@ -189,9 +191,9 @@ Request.prototype.removeHeader = function(name) {
 
 
 Request.prototype.setUrl = function(url) {
-    if(!_.isString(url) || !Helpers.isValidUrl(url))
+    if (!_.isString(url) || !Helpers.isValidUrl(url))
         throw new Error("The `url` parameter must be valid url string");
-    this._url = url;    
+    this._url = url;
     return this;
 };
 
@@ -204,7 +206,7 @@ Request.prototype.setResource = function(resource, data) {
 
 
 Request.prototype.setLocalAddress = function(ipAddress) {
-    this.setOptions({localAddress: ipAddress}, true)
+    this.setOptions({ localAddress: ipAddress }, true)
     return this;
 };
 
@@ -218,24 +220,24 @@ Request.prototype.setCSRFToken = function(token) {
 
 
 Request.prototype.setSession = function(session) {
-    if(!(session instanceof Session))
+    if (!(session instanceof Session))
         throw new Error("`session` parametr must be instance of `Session`")
     this._session = session;
     this.setCSRFToken(session.CSRFToken);
     this.setOptions({
         jar: session.jar
     });
-    if(session.device)
+    if (session.device)
         this.setDevice(session.device);
-    if(session.proxyUrl)
-        this.setOptions({proxy: session.proxyUrl});
+    if (session.proxyUrl)
+        this.setOptions({ proxy: session.proxyUrl });
     return this;
 };
 
 
 Request.prototype.setDevice = function(device) {
-    if(!(device instanceof Device))
-        throw new Error("`device` parametr must be instance of `Device`") 
+    if (!(device instanceof Device))
+        throw new Error("`device` parametr must be instance of `Device`")
     this._device = device;
     this.setHeaders({
         'User-Agent': device.userAgent()
@@ -247,12 +249,12 @@ Request.prototype.setDevice = function(device) {
 };
 
 
-Request.prototype.signData = function () {
+Request.prototype.signData = function() {
     var that = this;
-    if(!_.includes(['POST', 'PUT', 'PATCH', 'DELETE'], this._request.method))
+    if (!_.includes(['POST', 'PUT', 'PATCH', 'DELETE'], this._request.method))
         throw new Error("Wrong request method for signing data!");
     return signatures.sign(this._request.data)
-        .then(function (data) {
+        .then(function(data) {
             that.setHeaders({
                 'User-Agent': that.device.userAgent(data.appVersion)
             });
@@ -266,11 +268,11 @@ Request.prototype.signData = function () {
 
 Request.prototype._prepareData = function() {
     var that = this;
-    return new Promise(function(resolve, reject){
-        if(that._request.method == 'GET') 
+    return new Promise(function(resolve, reject) {
+        if (that._request.method == 'GET')
             return resolve({})
-        if(that._signData) {
-            that.signData().then(function(data){
+        if (that._signData) {
+            that.signData().then(function(data) {
                 var obj = {};
                 obj[that._request.bodyType] = data;
                 resolve(obj);
@@ -279,8 +281,8 @@ Request.prototype._prepareData = function() {
             var obj = {};
             obj[that._request.bodyType] = that._request.data;
             resolve(obj);
-        }  
-    })    
+        }
+    })
 };
 
 
@@ -295,10 +297,10 @@ Request.prototype._mergeOptions = function(options) {
 };
 
 
-Request.prototype.parseMiddleware = function (response) {
-    if(response.req._headers.host==='upload.instagram.com' && response.statusCode===201){
+Request.prototype.parseMiddleware = function(response) {
+    if (response.req._headers.host === 'upload.instagram.com' && response.statusCode === 201) {
         var loaded = /(\d+)-(\d+)\/(\d+)/.exec(response.body);
-        response.body = {status:"ok",start:loaded[1],end:loaded[2],total:loaded[3]};
+        response.body = { status: "ok", start: loaded[1], end: loaded[2], total: loaded[3] };
         return response;
     }
     try {
@@ -310,7 +312,7 @@ Request.prototype.parseMiddleware = function (response) {
 };
 
 
-Request.prototype.errorMiddleware = function (response) {
+Request.prototype.errorMiddleware = function(response) {
     response = this.parseMiddleware(response);
     var json = response.body;
     if (json.spam)
@@ -321,9 +323,9 @@ Request.prototype.errorMiddleware = function (response) {
         throw new Exceptions.AuthenticationError("Login required to process this request");
     if (json.error_type == 'sentry_block')
         throw new Exceptions.SentryBlockError(json);
-    if (response.statusCode===429 || _.isString(json.message) && json.message.toLowerCase().indexOf('too many requests') !== -1)
+    if (response.statusCode === 429 || _.isString(json.message) && json.message.toLowerCase().indexOf('too many requests') !== -1)
         throw new Exceptions.RequestsLimitError();
-    if (_.isString(json.message) && json.message.toLowerCase().indexOf('not authorized to view user') !== -1) 
+    if (_.isString(json.message) && json.message.toLowerCase().indexOf('not authorized to view user') !== -1)
         throw new Exceptions.PrivateUserError();
     throw new Exceptions.RequestError(json);
 };
@@ -331,37 +333,37 @@ Request.prototype.errorMiddleware = function (response) {
 
 // If you need to perform loging or something like that!
 // will also accept promise
-Request.prototype.beforeParse = function (response, request, attemps) {
+Request.prototype.beforeParse = function(response, request, attemps) {
     return response;
 }
 
-Request.prototype.beforeError = function (error, request, attemps) {
+Request.prototype.beforeError = function(error, request, attemps) {
     throw error;
 }
 
-Request.prototype.afterError = function (error, request, attemps) {
+Request.prototype.afterError = function(error, request, attemps) {
     throw error;
 }
 
 
-Request.prototype.send = function (options, attemps) {
+Request.prototype.send = function(options, attemps) {
     var that = this;
     if (!attemps) attemps = 0;
     return this._mergeOptions(options)
         .then(function(opts) {
-            return [opts, that._prepareData()];    
+            return [opts, that._prepareData()];
         })
-        .spread(function(opts, data){
+        .spread(function(opts, data) {
             opts = _.defaults(opts, data);
             return that._transform(opts);
         })
-        .then(function(opts) { 
+        .then(function(opts) {
             options = opts;
             return [Request.requestClient(options), options, attemps]
         })
         .spread(_.bind(this.beforeParse, this))
         .then(_.bind(this.parseMiddleware, this))
-        .then(function (response) {
+        .then(function(response) {
             var json = response.body;
             if (_.isObject(json) && json.status == "ok")
                 return _.omit(response.body, 'status');
@@ -372,11 +374,11 @@ Request.prototype.send = function (options, attemps) {
         .catch(function(error) {
             return that.beforeError(error, options, attemps)
         })
-        .catch(function (err) {
+        .catch(function(err) {
             if (err instanceof Exceptions.APIError)
                 throw err;
-            if(!err || !err.response)
-                throw err;    
+            if (!err || !err.response)
+                throw err;
             var response = err.response;
             if (response.statusCode == 404)
                 throw new Exceptions.NotFoundError(response);
@@ -391,7 +393,7 @@ Request.prototype.send = function (options, attemps) {
                 that.errorMiddleware(response)
             }
         })
-        .catch(function (error) {
+        .catch(function(error) {
             if (error instanceof Exceptions.APIError)
                 throw error;
             error = _.defaults(error, { message: 'Fatal internal error!' });

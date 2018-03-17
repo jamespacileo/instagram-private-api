@@ -6,23 +6,23 @@ var support = require('./support');
 var _ = require('lodash');
 var fs = require('fs');
 var imageDiff = require('image-diff');
-var rp = require("request-promise");
+var rp = require("request-promise-native");
 var dir = './cookies';
 var session;
 var credentails; // [username, password, proxy]
 
 var deleteFolderRecursive = function(path) {
-  if( fs.existsSync(path) ) {
-    fs.readdirSync(path).forEach(function(file,index){
-      var curPath = path + "/" + file;
-      if(fs.lstatSync(curPath).isDirectory()) { // recurse
-        deleteFolderRecursive(curPath);
-      } else { // delete file
-        fs.unlinkSync(curPath);
-      }
-    });
-    fs.rmdirSync(path);
-  }
+    if (fs.existsSync(path)) {
+        fs.readdirSync(path).forEach(function(file, index) {
+            var curPath = path + "/" + file;
+            if (fs.lstatSync(curPath).isDirectory()) { // recurse
+                deleteFolderRecursive(curPath);
+            } else { // delete file
+                fs.unlinkSync(curPath);
+            }
+        });
+        fs.rmdirSync(path);
+    }
 };
 
 deleteFolderRecursive(__dirname + '/cookies');
@@ -37,31 +37,31 @@ process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 // Client.Request.setProxy('http://127.0.0.1:8888')
 // Client.Request.setSocks5Proxy("127.0.0.1", 8888);
 
-describe("Sessions", function () {
-    before(function (done) {
+describe("Sessions", function() {
+    before(function(done) {
         // Wait one hour
-        this.timeout(60 * 60 * 1000);
+        this.timeout(60 * 60 *  1000);
         support.credentials()
-            .then(function (auth) {
+            .then(function(auth) {
                 credentails = auth;
                 done();
             });
     });
 
-    it("should have credentials", function () {
+    it("should have credentials", function() {
         credentails.length.should.be.equal(3);
         credentails[0].should.be.String()
         credentails[1].should.be.String()
     });
 
-    it("should not be problem to create sessions", function (done) {
+    it("should not be problem to create sessions", function(done) {
         var device = new Client.Device(credentails[0]);
-        var storage = new Client.CookieFileStorage(__dirname + '/cookies/'+credentails[0]+'.json');
+        var storage = new Client.CookieFileStorage(__dirname + '/cookies/' + credentails[0] + '.json');
         var promise = Client.Session.create(device, storage, credentails[0], credentails[1], credentails[2]);
         promise.then(function(sessionInstance) {
             session = sessionInstance;
             module.exports.session = session;
-        	session.should.be.instanceOf(Client.Session);
+            session.should.be.instanceOf(Client.Session);
             done();
         });
     });
@@ -75,7 +75,7 @@ describe("Sessions", function () {
 
     describe("Samples", function() {
         it("should not be problem to get account from session", function(done) {
-            session.getAccount().then(function(acc){
+            session.getAccount().then(function(acc) {
                 acc.should.be.instanceOf(Client.Account);
                 acc.params.should.have.property('username')
                 done();
@@ -87,7 +87,7 @@ describe("Sessions", function () {
                 .then(function(account) {
                     account.params.username.should.be.equal('instagram');
                     done();
-                }) 
+                })
         })
 
         it("should not be problem to show discover feed", function(done) {
@@ -97,13 +97,13 @@ describe("Sessions", function () {
                     discover[0].account.should.be.instanceOf(Client.Account)
                     discover[0].mediaIds.should.be.Array();
                     done();
-                }) 
+                })
         })
 
         it("should be able to ask for json endpoint trough web-request", function(done) {
-            var request = new  Client.Web.Request(session)
+            var request = new Client.Web.Request(session)
                 .setMethod('GET')
-                .setResource('userInfo', {id: 'instagram'})
+                .setResource('userInfo', { id: 'instagram' })
                 .setJSONEndpoint()
                 .send()
                 .then(function(result) {
@@ -111,13 +111,13 @@ describe("Sessions", function () {
                     result.user.username.should.be.String();
                     result.user.username.should.equal('instagram')
                     done();
-                }) 
+                })
         })
 
         it("should not be problem to get media likers", function(done) {
             Client.Media.likers(session, '1317759032287303554_25025320')
                 .then(function(likers) {
-                    _.each(likers, function(liker){ 
+                    _.each(likers, function(liker) {
                         liker.should.be.instanceOf(Client.Account)
                     })
                     done();
@@ -197,13 +197,13 @@ describe("Sessions", function () {
             var storage = new Client.CookieMemoryStorage();
             var promise = Client.Session.create(device, storage, credentails[0], credentails[1], credentails[2]);
             promise.then(function(sessionInstance) {
-                sessionInstance.should.be.instanceOf(Client.Session);
-                return sessionInstance.getAccount()
-            })
-            .then(function(account) {
-                account.should.be.instanceOf(Client.Account)
-                done();
-            })
+                    sessionInstance.should.be.instanceOf(Client.Session);
+                    return sessionInstance.getAccount()
+                })
+                .then(function(account) {
+                    account.should.be.instanceOf(Client.Account)
+                    done();
+                })
         })
 
         it("should not be problem to upload profile picture", function(done) {
@@ -213,33 +213,33 @@ describe("Sessions", function () {
             var catTmpPath = __dirname + '/tmp/downloaded.jpg'
             var promise = Client.Session.create(device, storage, credentails[0], credentails[1], credentails[2]);
             promise.then(function(sessionInstance) {
-                sessionInstance.should.be.instanceOf(Client.Session);
-                return Client.Account.setProfilePicture(session, catPath)
-            })
-            .then(function(account) {
-                account.should.be.instanceOf(Client.Account)
-                var picture = account.params.picture
-                return [rp.get(picture, {encoding: 'binary'}), account]
-            })
-            .spread(function (picture, account) {
-                fs.writeFileSync(__dirname + '/tmp/downloaded.jpg', picture, 'binary');
-                return new Promise(function(res, rej) {
-                    imageDiff.getFullResult({
-                        actualImage: catTmpPath,
-                        expectedImage: catPath
-                    }, function(err, diff) {
-                        if(err) return rej(err);
-                        return res(diff)
+                    sessionInstance.should.be.instanceOf(Client.Session);
+                    return Client.Account.setProfilePicture(session, catPath)
+                })
+                .then(function(account)  {
+                    account.should.be.instanceOf(Client.Account)
+                    var picture = account.params.picture
+                    return [rp.get(picture, { encoding: 'binary' }), account]
+                })
+                .spread(function(picture, account) {
+                    fs.writeFileSync(__dirname + '/tmp/downloaded.jpg', picture, 'binary');
+                    return new Promise(function(res, rej) {
+                        imageDiff.getFullResult({
+                            actualImage: catTmpPath,
+                            expectedImage: catPath
+                        }, function(err, diff) {
+                            if (err) return rej(err);
+                            return res(diff)
+                        })
                     })
                 })
-            })
-            .then(function(diff) {
-                diff.percentage.should.be.below(0.1)
-                done();
-            })
-              .catch(function (reason) {
-                done(reason);
-              })
+                .then(function(diff) {
+                    diff.percentage.should.be.below(0.1)
+                    done();
+                })
+                .catch(function(reason) {
+                    done(reason);
+                })
         })
     })
 
