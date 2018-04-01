@@ -4,7 +4,7 @@ var _ = require("lodash");
 var crypto = require('crypto');
 var pruned = require('./json-pruned');
 var fs = require('fs');
-var request = require('request-promise-native');
+var request = require('request-promise');
 var Promise = require("bluebird");
 
 

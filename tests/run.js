@@ -6,7 +6,7 @@ var support = require('./support');
 var _ = require('lodash');
 var fs = require('fs');
 var imageDiff = require('image-diff');
-var rp = require("request-promise-native");
+var rp = require("request-promise");
 var dir = './cookies';
 var session;
 var credentails; // [username, password, proxy]

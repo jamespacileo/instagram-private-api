@@ -2,7 +2,7 @@ var util = require("util");
 var Resource = require("./resource");
 var fs = require('fs');
 var _ = require('lodash');
-var request = require("request-promise-native");
+var request = require("request-promise");
 var CookieStorage = require("./cookie-storage");
 var RequestJar = require("./jar");
 
